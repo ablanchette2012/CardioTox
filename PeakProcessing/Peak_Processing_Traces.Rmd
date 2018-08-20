@@ -1,0 +1,74 @@
+---
+title: "Calcium Flux Trace Plotting"
+author: "Weihsueh Chiu & Alex Blanchette"
+date: "March 8, 2018"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir="C:\\Users\\ablanchette\\Documents\\CM Peak Processing\\Cardiotox_Repeat Experiment\\1083")
+```
+
+## Load R functions
+```{r load functions}
+source("ChiuPeakProcessingAlgorithm.R")
+source("ChiuPeakProcessingUtilities.R")
+source("tcpl_fit_functions.R")
+```
+
+## Load and process multiple plates
+
+### Read files
+
+```{r load  multiple plates}
+seq1.file.list<- get.seq1.file.list(".")
+n.files<-length(seq1.file.list)
+dat.list<-list()
+for (n in 1:n.files) {
+ 	fname<-seq1.file.list[n]
+  dat.list[[n]]<-get.seq1.dat(fname)
+}
+```
+### Produce Trace plots
+
+```{r plot examples,fig.height=4,fig.width=6}
+
+## While file?
+
+filenum<-1
+
+## "dat" is a data frame with Well (e.g., E3) in the first column, and the data in the other columns
+
+dat<-dat.list[[filenum]]
+
+t<-as.numeric(sub("X","",colnames(dat)[-1]))
+
+##Set up loop to export each trace as a .png into new directory folder
+
+##change working directory to new folder where you want the traces
+
+setwd("C:\\Users\\ablanchette\\Documents\\CM Peak Processing\\Cardiotox_Repeat Experiment\\1083\\1083_Traces")
+
+for (i in 1:length(dat$Well)) {
+
+  plotname<-paste("1083_Trace_", dat$Well[i], ".png", sep="")   
+  
+  rownum<-i
+
+  y<-dat[rownum,-1]
+
+  well<-dat[rownum,1]
+
+  png(plotname)
+  
+  plot(t,y,cex=0.5,type="l");
+
+  mtext(paste(seq1.file.list[filenum]," Row ",rownum," (Well ",well,")",sep=""),side=3,cex=0.75)
+  
+  dev.off()
+}
+
+```
