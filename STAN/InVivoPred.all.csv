@@ -1,0 +1,17 @@
+,Chemical.name,Model,xfree,PredFoldChange,PredFracChange
+32,cisapride,in vivo Linear,0.035481339,1.212124386,0.212124386
+93,citalopram hydrobromide,in vivo Linear,1,1.152654118,0.152654118
+164,disopyramide phosphate,in vivo Linear,3.16227766,1.105570004,0.105570004
+243,disopyramide phosphate,in vivo Hill,7.943282347,1.120474259,0.120474259
+256,dofetilide,in vivo Hill,0.003981072,1.122016447,0.122016447
+325,moxifloxacin hydrochloride,in vivo Linear,2.511886432,1.016974263,0.016974263
+426,N-acetylprocainamide,in vivo Linear,100,1.190181818,0.190181818
+527,N-acetylprocainamide,in vivo Hill,100,1.29921251,0.29921251
+595,quinidine sulfate,in vivo Linear,2.238721139,2.093822647,1.093822647
+665,sematilide,in vivo Linear,2.818382931,1.279616313,0.279616313
+735,sematilide,in vivo Hill,2.818382931,1.152194953,0.152194953
+802,sotalol,in vivo Linear,1.995262315,1.052436194,0.052436194
+884,vernacalant,in vivo Hill,11.22018454,1.030274975,0.030274975
+931,cabazitaxel,in vivo Linear,0.199526231,1,0
+1019,lamotrigine,in vivo Linear,22.38721139,1,0
+1068,mifepristone,in vivo Linear,0.251188643,1,0
