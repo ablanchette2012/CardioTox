@@ -79,6 +79,6 @@ for (i in 1:nrow(chems1434_new)) {
   
 }
 
-write.table(alldat, "Nonblinded.peak.parms.stdnum.sum.dat")
+write.table(alldat, "Nonblinded.peak.parms.stdnum.sum.dat", sep="\t",row.names=FALSE)
 
 
