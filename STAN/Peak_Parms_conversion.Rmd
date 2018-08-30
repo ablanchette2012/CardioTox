@@ -1,0 +1,69 @@
+---
+title: "Peak Parm .csv .dat Conversion"
+author: "Alex blanchette"
+date: "August 30, 2018"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(data.table)
+```
+
+## R Markdown
+
+## Set-up
+
+```{r load in csv file}
+
+files = list.files(pattern="*.csv")
+
+for (l in 1:length(files)) assign(files[l], read.csv(files[l]))
+
+head((eval(parse(text=files[1]))))
+```
+
+## Manipulation
+
+```{r add donor id column }
+
+#change accordingly
+
+donor.id= 1516
+
+peak.parms<-data.frame(rep(donor.id, nrow((eval(parse(text=files[1]))))), (eval(parse(text=files[1]))))
+
+colnames(peak.parms)[1]<-"Cell.line"
+
+head(peak.parms)
+
+```
+
+```{r change column orders }
+
+peak.parms.new<-peak.parms
+
+peak.parms.new$rowcol<-peak.parms$Plate
+
+peak.parms.new$Plate<-peak.parms$rowcol
+
+setnames(peak.parms.new, old=c("rowcol", "Plate"), new=c("Plate", "Well" ))
+
+```
+
+```{r delete chemical.name column}
+
+peak.parms.new$Chemical.name<-NULL
+
+head(peak.parms.new)
+
+```
+
+## Output
+
+```{r save new df as .dat file}
+
+write.table(peak.parms.new, paste("Peak.Parms.", donor.id, ".dat", sep=""), sep="\t",row.names=FALSE)
+
+```
