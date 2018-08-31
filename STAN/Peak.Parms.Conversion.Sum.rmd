@@ -1,0 +1,62 @@
+---
+title: "Peak Parms .csv to .dat file conversion (batch)"
+author: "Alex Blanchette"
+date: "August 30, 2018"
+output: word_document
+---
+
+##Setup
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(data.table)
+```
+
+```{r load in peak.parm.csv files create Cell.Lines list and empty data frame}
+
+cell.lines<-list(1516,1535,20080)
+
+files = list.files(pattern="*.csv")
+
+for (l in 1:length(files)) assign(files[l], read.csv(files[l]))
+
+peak.parms.sum<-data.frame()
+
+```
+
+## Configure each file to correct format
+```{r Loop to configure each file}
+
+for (i in 1:length(files)) {
+  
+  
+  donor.id<-cell.lines[i]
+  
+  peak.parms<-data.frame(donor.id, (eval(parse(text=files[i]))))
+
+  colnames(peak.parms)[1]<-"Cell.line"
+
+  peak.parms.new<-peak.parms
+
+  peak.parms.new$rowcol<-peak.parms$Plate
+
+  peak.parms.new$Plate<-peak.parms$rowcol
+
+  setnames(peak.parms.new, old=c("rowcol", "Plate"), new=c("Plate", "Well" ))
+  
+  peak.parms.new$Chemical.name<-NULL
+  
+  peak.parms.sum<-rbind(peak.parms.sum, peak.parms.new)
+
+}
+
+```
+
+##Output
+
+```{r output combined file as .dat}
+
+write.table(peak.parms.sum, "Peak.Parms.Sum.dat",sep="\t", row.names=FALSE)
+
+```
