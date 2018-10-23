@@ -1,0 +1,188 @@
+---
+title: "Peak.Parms.DoubleCO"
+author: "Alex Blanchette"
+date: "October 11, 2018"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE)
+
+library(schoolmath)
+
+library(beepr)
+
+```
+
+```{r import raw peak parms and set up for notch CO}
+
+Parms<- read.table("Peak.Parms.All.dat", na.strings = "Vehicle Media"  ,as.is = TRUE, header = TRUE)
+
+Parms$Chemical.Number<- as.numeric(Parms$Chemical.Number)
+
+Parms.Chems<- subset(Parms, Chemical.Number < 139 & Chemical.Number != 0)
+
+Parms.new<-subset(Parms, Chemical.Concentration==0 | is.na(Chemical.Number) | Chemical.Number > 138)
+
+ChemNumList<-unique(Parms.Chems$Chemical.Number)
+
+indivlist<-unique(Parms.Chems$Cell.line)
+
+```
+
+```{r Notch CO and export}
+
+for (Chemnum in ChemNumList){
+  
+  #print(Chemnum)
+  
+  for (indiv in indivlist){
+    
+    #print (indiv)
+    
+    parms.tmp<-subset(Parms.Chems, Chemical.Number==Chemnum & Cell.line==indiv)
+    
+    if (nrow(parms.tmp)>4 | is.odd(nrow(parms.tmp)) == TRUE){
+      
+      batchframe<- data.frame(parms.tmp$Rep, parms.tmp$Batch)
+      
+      batchframe<-unique(batchframe)
+      
+      colnames(batchframe)<- c("Rep", "Batch")
+      
+      for (i in nrow(batchframe)){
+        
+        sub.parms<- subset(parms.tmp, Rep == batchframe$Rep[i] & Batch == batchframe$Batch[i])
+        
+        if (sum(sub.parms$notch.frac, na.rm =TRUE)==0){
+          
+          Parms.new<-rbind(Parms.new, sub.parms)
+          
+        }else{
+          
+          tmp.sub<-subset(sub.parms, notch.frac>0)
+          
+          minconc<-min(tmp.sub$Chemical.Concentration)
+          
+          parms.tmp.sub<-subset(sub.parms, Chemical.Concentration<=minconc)
+          
+          Parms.new<-rbind(Parms.new, parms.tmp.sub)
+          
+        }
+        
+      }
+      
+    } else if (sum(parms.tmp$notch.frac, na.rm =TRUE)==0){ 
+    
+      Parms.new<-rbind(Parms.new, parms.tmp)
+      
+      }else{
+      
+          tmp.sub<-subset(parms.tmp, notch.frac>0)
+      
+          minconc<-min(tmp.sub$Chemical.Concentration)
+      
+          parms.tmp<-subset(parms.tmp, Chemical.Concentration<=minconc)
+      
+          Parms.new<-rbind(Parms.new, parms.tmp)
+     
+      }
+      
+    }
+    
+  }
+
+#Parms.new.v2<- subset(Parms.new, Cell.line != "NA")
+
+#Parms.new.v2<- unique(Parms.new)
+
+write.table(Parms.new, "Peak.Parms.All.NotchCO.dat", sep="\t",row.names=FALSE)
+
+beep(sound=2)
+
+```
+
+```{r import processed peak parms for second round of COs}
+
+Parms<- read.table("Peak.Parms.All.NotchCO.dat", na.strings = "Vehicle Media"  ,as.is = TRUE, header = TRUE)
+
+Parms$Chemical.Number<- as.numeric(Parms$Chemical.Number)
+
+Parms.Chems<- subset(Parms, Chemical.Number < 139 & Chemical.Number != 0)
+
+Parms.new<-subset(Parms, Chemical.Concentration==0 | is.na(Chemical.Number) | Chemical.Number > 138)
+
+```
+
+```{r Peak.Amp.Avg CO and export}
+
+for (Chemnum in ChemNumList){
+  
+  #print(Chemnum)
+  
+  for (indiv in indivlist){
+    
+    #print (indiv)
+    
+    parms.tmp<-subset(Parms.Chems, Chemical.Number==Chemnum & Cell.line==indiv)
+    
+     if (nrow(parms.tmp)>4 | is.odd(nrow(parms.tmp)) == TRUE){
+      
+      batchframe<- data.frame(parms.tmp$Rep, parms.tmp$Batch)
+      
+      batchframe<-unique(batchframe)
+      
+      colnames(batchframe)<- c("Rep", "Batch")
+      
+      for (i in nrow(batchframe)){
+        
+        sub.parms<- subset(parms.tmp, Rep == batchframe$Rep[i] & Batch == batchframe$Batch[i])
+        
+        if (0 %in% sub.parms$peak.amp.avg == TRUE){
+          
+          tmp.sub<- subset(sub.parms, peak.amp.avg=0)
+          
+          minconc<- min(tmp.sub$Chemical.Concentration)
+          
+          parms.tmp.sub<- subset(sub.parms, Chemical.Concentration <=minconc)
+          
+          Parms.new<- rbind(Parms.new, parms.tmp.sub)
+          
+        } else {
+          
+          Parms.new<- rbind(Parms.new, parms.tmp)
+          
+        }
+        
+      }
+      
+    } else if (0 %in% sub.parms$peak.amp.avg == TRUE){
+      
+      tmp.sub<- subset(sub.parms, peak.amp.avg=0)
+      
+      minconc<- min(tmp.sub$Chemical.Concentration)
+      
+      parms.tmp<- subset(sub.parms, Chemical.Concentration <=minconc)
+      
+      Parms.new<- rbind(Parms.new, parms.tmp)
+      
+    } else {
+      
+      Parms.new<- rbind(Parms.new, parms.tmp)
+      
+    }
+    
+  }
+  
+}
+
+Parms.new.v2<- subset(Parms.new, Cell.line != "NA")
+
+Parms.new.v2<- unique(Parms.new)
+
+write.table(Parms.new.v2, "Peak.Parms.All.NotchAmpCO.dat", sep="\t",row.names=FALSE)
+
+beep(sound=2)
+
+```
