@@ -303,7 +303,7 @@ chemicals<- read.table("chemicals.dat", as.is = TRUE, header = FALSE)
 
 ## set up to loop through directories using name of chemical list to match directory name, MAKE SURE TO ADJUST CHEM NUMS 
 
-for (i in c(4,27,30)) {
+for (i in c(24,25,26)) {
   
   setwd(paste(getwd(), "/", chemicals[(i+1),2], sep=""))
   
@@ -329,12 +329,15 @@ for (i in c(4,27,30)) {
     
     write.csv(dat.tmp, file.name, row.names = FALSE)
     
+    
+    
   }
+  
+  setwd("..")  
   
 }
 
 beep(sound=3)
-
 
 
 
