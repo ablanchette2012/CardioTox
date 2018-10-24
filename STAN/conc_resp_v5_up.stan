@@ -100,7 +100,7 @@ generated quantities {
 	}
 	for (i in 1:Ni) {
 		if (Emax[i] > 1) 
-			ec50[i] = x0[i]*(1 * Emax[i] / (Emax[i] - 1))^(1/n[i]);
+			ec50[i] = x0[i]*(0.5 * Emax[i] / (Emax[i] - 0.5))^(1/n[i]);
 		else
 			ec50[i] = 1000;
 	}
