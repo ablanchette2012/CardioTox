@@ -1,0 +1,14 @@
+﻿Chemical,FracFreePlasma,FracFreeMedia,CmaxLinuMtot,SlopemsecuMtot,SlopeGSD,QTc0Linmsec,CmaxHilluMtot,Emaxmsec,KduMtot,nHill,QTc0Hillmsec,References
+Cisapride,0.02975,0.585,0.936,90,1,386,NA,NA,NA,NA,386,Chain et al. 2013
+Citalopram,0.2,0.719,5.548876353,12.9756,2.017784243,425,NA,NA,NA,NA,425,Friberg et al. 2006
+Disopyramide,0.375,0.856,8.640157094,5.633578125,1,450,23.5640648,97.4,7.171330388,1,450,Thibonnier et al. 1984; Lima & Boudoulas 1998
+Dofetilide,0.27,0.950,NA,NA,NA,NA,0.013590034,131,0.004983012,2.9,368,Le Coz et al. 1995
+Moxifloxacin,0.4,0.942,4.412057798,1.6056,2.29331874,396,NA,NA,NA,NA,396,Chain et al. 2011
+N-acetylprocainamide,0.3,0.982,114.7227533,0.75312,1.08690405,440,114.7227533,170,29.12683238,1,440,"Piergies et al., 1987"
+Quinidine,0.435,0.759,10.17262639,86.502882,1,407,NA,NA,NA,NA,407,Karbwang et al. 1993
+Sematilide,0.96,0.988,3.044305518,37.5258,1.277746576,394,3.044305518,90.5,1.435172601,1,394,Shi et al. 1995
+Sotalol,1,0.997,3.421941548,5.99192,1.404947591,380,NA,NA,NA,NA,380,Chain et al. 2011
+Vernacalant,0.58,0.593,NA,NA,NA,NA,19.45636624,20.3,6.52360515,1,424,"Mao et al., 2011"
+Cabazitaxel,0.058,0.458,2.153290347,0,1,400,NA,NA,NA,NA,400,Maison-Blanche et al. 2014
+Lamotrigine,0.45,0.928,54.66806721,0,1,400,NA,NA,NA,NA,400,Dixon et al. 2008
+Mifepristone,0.015,0.058,13.96648045,0,1,400,NA,NA,NA,NA,400,Darpo et al. 2013

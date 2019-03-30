@@ -1,0 +1,1050 @@
+---
+title: "In vitro Dose-Response Results_v4_LiteratureFreeFrac"
+author: "Weihsueh Chiu"
+date: "7/23/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(viridis)
+# contains two objects: chemmap and data.list
+# created by source("MakeInVivoInVitrodata-LiteratureFreeFrac.R")
+load("InVivoInVitrodat-LiteratureFreeFrac_43.Rdata")
+celllines<-as.character(read.csv("43Cell.lines.csv",as.is=TRUE)[,2])
+names(celllines)<-1:length(celllines)
+```
+
+## Plots of just in vitro predictions
+
+```{r plots in vitro}
+cols=c("population median"=magma(5)[3],
+       "population median CI"=magma(5)[4],
+       "random individual CI"=magma(5)[5])
+linevals<-c("Standard Donor (1434)"=2,
+            "Donor 1392"=3,
+            "Donor 1258"=4,
+            "Donor 1083"=5,
+            "Donor 1070"=6)
+for (j in 1:nrow(chemmap)) {
+  with(data.list[[j]], {
+    p1<-ggplot(Simulation_Frame_Fold)+
+      geom_ribbon(aes(x=concentration, ymin=p2.5, ymax=p97.5,
+                      fill="random individual CI"))+
+      geom_ribbon(data=Simulation_Frame_Zero_Fold, 
+                  aes(x=concentration, ymin=p2.5, ymax=p97.5,
+                      fill="population median CI"))+
+      geom_line(data=Simulation_Frame_Zero_Fold, 
+                aes(x=concentration, y=p50,color="population median"),
+                linetype=1,size=2)+
+      geom_line(data=Simulation_Frame_27_Fold, 
+                aes(x=concentration, y=p50, linetype="Standard Donor (1434)"))+
+      geom_line(data=Simulation_Frame_22_Fold, 
+                aes(x=concentration, y=p50, linetype="Donor 1392"))+
+      geom_line(data=Simulation_Frame_11_Fold, 
+                aes(x=concentration, y=p50, linetype="Donor 1258"))+
+      geom_line(data=Simulation_Frame_6_Fold, 
+                aes(x=concentration, y=p50, linetype="Donor 1083"))+
+      geom_line(data=Simulation_Frame_3_Fold, 
+                aes(x=concentration, y=p50, linetype="Donor 1070"))+
+      xlab("Concentration (uM)")+
+      ylab("Decay Rise Ratio (Fold Change)")+
+      coord_cartesian(xlim=c(1e-3,100),expand=FALSE)+
+      scale_x_log10()+
+      scale_y_log10()+
+      annotation_logticks(color="grey50")+
+      ggtitle(paste(chemical.name,
+                    "Fold Change Peak Decay Rise Ratio Up (Log Scale)"))+
+      scale_fill_manual(name="",values=cols)+
+      scale_color_manual(name="",values=cols)+
+      scale_linetype_manual(name="",values=linevals)+
+      guides(color = guide_legend(order=1),
+               fill = guide_legend(override.aes = list(linetype = 0),order=2),
+             linetype = guide_legend(reverse=TRUE),order=3)+
+    theme_bw()
+    
+    p2<-ggplot(Simulation_Frame_Frac)+
+      geom_ribbon(aes(x=concentration, ymin=100*p2.5, ymax=100*p97.5,
+                      fill="random individual CI"))+
+      geom_ribbon(data=Simulation_Frame_Zero_Frac, 
+                  aes(x=concentration, ymin=100*p2.5, ymax=100*p97.5,
+                      fill="population median CI"))+
+      geom_line(data=Simulation_Frame_Zero_Frac, 
+                aes(x=concentration, y=100*p50,color="population median"),
+                linetype=1,size=2)+
+      geom_line(data=Simulation_Frame_27_Frac, 
+                aes(x=concentration, y=100*p50, linetype="Standard Donor (1434)"))+
+      geom_line(data=Simulation_Frame_22_Frac, 
+                aes(x=concentration, y=100*p50, linetype="Donor 1392"))+
+      geom_line(data=Simulation_Frame_11_Frac, 
+                aes(x=concentration, y=100*p50, linetype="Donor 1258"))+
+      geom_line(data=Simulation_Frame_6_Frac, 
+                aes(x=concentration, y=100*p50, linetype="Donor 1083"))+
+      geom_line(data=Simulation_Frame_3_Frac, 
+                aes(x=concentration, y=100*p50, linetype="Donor 1070"))+
+      xlab("Concentration (uM)")+
+      ylab("Decay Rise Ratio (Percent Change)")+
+      scale_x_log10()+
+      scale_y_log10()+
+      annotation_logticks(color="grey50")+
+      coord_cartesian(xlim=c(1e-3,100),ylim=c(1e-1,1000),expand=FALSE)+
+      ggtitle(paste(chemical.name,
+                    "Percent Change Peak Decay Rise Ratio Up (Log Scale)"))+
+      scale_fill_manual(name="",values=cols)+
+      scale_color_manual(name="",values=cols)+
+      scale_linetype_manual(name="",values=linevals)+
+      guides(color = guide_legend(order=1),
+               fill = guide_legend(override.aes = list(linetype = 0),order=2),
+             linetype = guide_legend(reverse=TRUE),order=3)+
+      theme_bw()
+    print(p1)
+    print(p2)
+  })
+}
+```
+
+
+## Plots of in vitro in vivo comparison
+
+```{r plots in vitro in vivo}
+cols=c("in vivo Linear"=magma(5)[1],
+       "in vivo Hill"=magma(5)[2],
+        "in vitro pop median"=magma(5)[3],
+       "in vitro pop median CI"=magma(5)[4],
+       "in vitro random indiv CI"=magma(5)[5])
+linevals<-c("Standard Donor (1434)"=2,
+            "Donor 1392"=3,
+            "Donor 1258"=4,
+            "Donor 1083"=5,
+            "Donor 1070"=6)
+
+for (j in 1:nrow(chemmap)) {
+  with(data.list[[j]], {
+    # p1<-ggplot(Simulation_Frame_Fold)+
+    #   geom_ribbon(aes(x=concentration, ymin=p2.5, ymax=p97.5,
+    #                   fill="in vitro random indiv CI"))+
+    #   geom_ribbon(data=Simulation_Frame_Zero_Fold, 
+    #               aes(x=concentration, ymin=p2.5, ymax=p97.5,
+    #                   fill="in vitro pop median CI"))+
+    #   geom_line(data=Simulation_Frame_Zero_Fold, 
+    #             aes(x=concentration, y=p50,color="in vitro pop median"),
+    #             linetype=1,size=2)+
+    #   geom_line(data=Simulation_Frame_27_Fold, 
+    #             aes(x=concentration, y=p50, linetype="Standard Donor (1434)"))+
+    #   geom_line(data=InVivo, aes(x=xfree,y=PredFoldChange, color=Model), 
+    #             size=2, show.legend = FALSE)+
+    #   xlab("Free Concentration (uM)")+
+    #   ylab("Decay Rise Ratio (Fold Change)")+
+    #   scale_x_log10(breaks=c(0.001,0.01,0.1,1,10,100),
+    #                 labels=c("0.001","0.01","0.1","1","10","100"))+
+    #   annotation_logticks(color="grey50",side="b")+
+    #   coord_cartesian(xlim=c(1e-3,100),expand=FALSE)+
+    #   # geom_vline(xintercept=(0.1*InVivoFree$FracFreeMedia), 
+    #   #            color="grey", linetype="dotted", size=1)+
+    #   ggtitle(paste(chemical.name,
+    #                 "Fold Change Peak Decay Rise Ratio"))+
+    #   scale_fill_manual(name="",values=cols)+
+    #   scale_color_manual(name="",values=cols)+
+    #   scale_linetype_manual(name="",values=linevals)+
+    #   guides(color = guide_legend(order=1),
+    #            fill = guide_legend(override.aes = list(linetype = 0),order=2),
+    #          linetype = guide_legend(reverse=TRUE),order=3)+
+    # theme_bw()
+
+    p1<-ggplot(Simulation_Frame_Frac)+
+      geom_ribbon(aes(x=concentration, ymin=100*p2.5, ymax=100*p97.5,
+                      fill="in vitro random indiv CI"))+
+      geom_ribbon(data=Simulation_Frame_Zero_Frac, 
+                  aes(x=concentration, ymin=100*p2.5, ymax=100*p97.5,
+                      fill="in vitro pop median CI"))+
+      geom_line(data=Simulation_Frame_Zero_Frac, 
+                aes(x=concentration, y=100*p50,color="in vitro pop median"),
+                linetype=1,size=2)+
+      geom_line(data=Simulation_Frame_27_Frac, 
+                aes(x=concentration, y=100*p50, linetype="Standard Donor (1434)"))+
+      geom_line(data=InVivo, aes(x=xfree,y=100*PredFracChange, color=Model), 
+                size=3, show.legend = FALSE)+
+      xlab("Free Concentration (uM)")+
+      ylab("Decay Rise Ratio (Percent Change)")+
+      scale_x_log10(breaks=c(0.001,0.01,0.1,1,10,100),
+                    labels=c("0.001","0.01","0.1","1","10","100"))+
+      # scale_y_log10(breaks=c(0.1,1,10,100,1000),
+      #               labels=paste(c(0.1,1,10,100,1000)))+
+      # annotation_logticks(color="grey50")+
+      coord_cartesian(xlim=c(1e-3,100),ylim=c(0,100),expand=FALSE)+
+      # geom_vline(xintercept=(0.1*InVivoFree$FracFreeMedia), 
+      #            color="grey", linetype="dotted", size=1)+
+      ggtitle(paste(chemical.name,
+                    "Percent Change Peak Decay Rise Ratio"))+
+      scale_fill_manual(name="",values=cols)+
+      scale_color_manual(name="",values=cols)+
+      scale_linetype_manual(name="",values=linevals)+
+      guides(color = guide_legend(order=1),
+               fill = guide_legend(override.aes = list(linetype = 0),order=2),
+             linetype = guide_legend(reverse=TRUE),order=3)+
+      theme_bw()
+        
+    p2<-ggplot(Simulation_Frame_Frac)+
+      geom_ribbon(aes(x=concentration, ymin=100*p2.5, ymax=100*p97.5,
+                      fill="in vitro random indiv CI"))+
+      geom_ribbon(data=Simulation_Frame_Zero_Frac, 
+                  aes(x=concentration, ymin=100*p2.5, ymax=100*p97.5,
+                      fill="in vitro pop median CI"))+
+      geom_line(data=Simulation_Frame_Zero_Frac, 
+                aes(x=concentration, y=100*p50,color="in vitro pop median"),
+                linetype=1,size=2)+
+      geom_line(data=Simulation_Frame_27_Frac, 
+                aes(x=concentration, y=100*p50, linetype="Standard Donor (1434)"))+
+      geom_line(data=InVivo, aes(x=xfree,y=100*PredFracChange, color=Model), 
+                size=2, show.legend = FALSE)+
+      xlab("Free Concentration (uM)")+
+      ylab("Decay Rise Ratio (Percent Change)")+
+      scale_x_log10(breaks=c(0.001,0.01,0.1,1,10,100),
+                    labels=c("0.001","0.01","0.1","1","10","100"))+
+      scale_y_log10(breaks=c(0.1,1,10,100,1000),
+                    labels=paste(c(0.1,1,10,100,1000)))+
+      annotation_logticks(color="grey50")+
+      coord_cartesian(xlim=c(1e-3,100),ylim=c(1e-1,1000),expand=FALSE)+
+      # geom_vline(xintercept=(0.1*InVivoFree$FracFreeMedia), 
+      #            color="grey", linetype="dotted", size=1)+
+      ggtitle(paste(chemical.name,
+                    "Percent Change Peak Decay Rise Ratio"))+
+      scale_fill_manual(name="",values=cols)+
+      scale_color_manual(name="",values=cols)+
+      scale_linetype_manual(name="",values=linevals)+
+      guides(color = guide_legend(order=1),
+               fill = guide_legend(override.aes = list(linetype = 0),order=2),
+             linetype = guide_legend(reverse=TRUE),order=3)+
+      theme_bw()
+
+    print(p1)
+    print(p2)
+    if (j <= 10) {
+    ggsave(paste(chemical.name,"43InVitroInVivoConcResp-LiteratureFreeFrac.pdf",sep="."),p2,
+        height=3,width=5,dpi=600)
+    } else {
+    ggsave(paste(chemical.name,"43InVitroInVivoConcResp-LiteratureFreeFrac.pdf",sep="."),p1,
+        height=3,width=5,dpi=600)
+    }
+  }
+  )
+}
+```
+
+## Generate Percent Change at Cmax in vivo vs in vitro
+```{r Cmax calcs}
+CmaxVivo<-data.frame()
+for (j in 1:nrow(chemmap)) {
+  for (k in 1:length(levels(data.list[[j]]$InVivo$Model))) {
+    CmaxVivo<- rbind(CmaxVivo,with(data.list[[j]], {
+      with(subset(InVivo,Model==levels(InVivo$Model)[k]),{
+        if (length(xfree)>0) {
+        data.frame(j=j,Chemical.name=Chemical.name[1],
+                        Model = Model[1],
+                        CmaxFree = xfree[length(xfree)],
+                        FracChangeCmaxFree=PredFracChange[length(xfree)])
+        }
+      }
+      )
+    }
+    )
+    )
+  }
+}
+CmaxVitro<- data.frame()
+for (i in 1:nrow(CmaxVivo)) {
+  j<-CmaxVivo$j[i]
+  cmaxfree<-CmaxVivo$CmaxFree[i]
+  CmaxVitro<- rbind(CmaxVitro,
+                  with(data.list[[j]], {
+                    with(Simulation_Frame_Zero_Frac, {
+                      data.frame(j=j,Chemical.name=chemical.name,
+                                 Model="in vitro Population Median",
+                                 FracChangeCmaxFree_p50=(approx(x=freeconcentration,
+                                                                y=p50,
+                                                                xout=cmaxfree)),
+                                 FracChangeCmaxFree_p2.5=(approx(x=freeconcentration,
+                                                                y=p2.5,
+                                                                xout=cmaxfree)),
+                                 FracChangeCmaxFree_p97.5=(approx(x=freeconcentration,
+                                                                y=p97.5,
+                                                                xout=cmaxfree))
+                                 ) 
+                      }
+                    )
+                  }
+                  )
+  )
+}
+for (i in 1:nrow(CmaxVivo)) {
+  j<-CmaxVivo$j[i]
+  cmaxfree<-CmaxVivo$CmaxFree[i]
+  CmaxVitro<- rbind(CmaxVitro,
+                  with(data.list[[j]], {
+                    with(Simulation_Frame_27_Frac, {
+                      data.frame(j=j,Chemical.name=chemical.name,
+                                 Model="in vitro Standard Donor",
+                                 FracChangeCmaxFree_p50=(approx(x=freeconcentration,
+                                                                y=p50,
+                                                                xout=cmaxfree)),
+                                 FracChangeCmaxFree_p2.5=(approx(x=freeconcentration,
+                                                                y=p2.5,
+                                                                xout=cmaxfree)),
+                                 FracChangeCmaxFree_p97.5=(approx(x=freeconcentration,
+                                                                y=p97.5,
+                                                                xout=cmaxfree))
+                                 ) 
+                      }
+                    )
+                  }
+                  )
+  )
+}
+for (i in 1:nrow(CmaxVivo)) {
+  j<-CmaxVivo$j[i]
+  cmaxfree<-CmaxVivo$CmaxFree[i]
+  CmaxVitro<- rbind(CmaxVitro,
+                  with(data.list[[j]], {
+                    with(Simulation_Frame_22_Frac, {
+                      data.frame(j=j,Chemical.name=chemical.name,
+                                 Model="in vitro Donor 1392",
+                                 FracChangeCmaxFree_p50=(approx(x=freeconcentration,
+                                                                y=p50,
+                                                                xout=cmaxfree)),
+                                 FracChangeCmaxFree_p2.5=(approx(x=freeconcentration,
+                                                                y=p2.5,
+                                                                xout=cmaxfree)),
+                                 FracChangeCmaxFree_p97.5=(approx(x=freeconcentration,
+                                                                y=p97.5,
+                                                                xout=cmaxfree))
+                                 ) 
+                      }
+                    )
+                  }
+                  )
+  )
+}
+
+for (i in 1:nrow(CmaxVivo)) {
+  j<-CmaxVivo$j[i]
+  cmaxfree<-CmaxVivo$CmaxFree[i]
+  CmaxVitro<- rbind(CmaxVitro,
+                  with(data.list[[j]], {
+                    with(Simulation_Frame_11_Frac, {
+                      data.frame(j=j,Chemical.name=chemical.name,
+                                 Model="in vitro Donor 1258",
+                                 FracChangeCmaxFree_p50=(approx(x=freeconcentration,
+                                                                y=p50,
+                                                                xout=cmaxfree)),
+                                 FracChangeCmaxFree_p2.5=(approx(x=freeconcentration,
+                                                                y=p2.5,
+                                                                xout=cmaxfree)),
+                                 FracChangeCmaxFree_p97.5=(approx(x=freeconcentration,
+                                                                y=p97.5,
+                                                                xout=cmaxfree))
+                                 ) 
+                      }
+                    )
+                  }
+                  )
+  )
+}
+
+for (i in 1:nrow(CmaxVivo)) {
+  j<-CmaxVivo$j[i]
+  cmaxfree<-CmaxVivo$CmaxFree[i]
+  CmaxVitro<- rbind(CmaxVitro,
+                  with(data.list[[j]], {
+                    with(Simulation_Frame_6_Frac, {
+                      data.frame(j=j,Chemical.name=chemical.name,
+                                 Model="in vitro Donor 1083",
+                                 FracChangeCmaxFree_p50=(approx(x=freeconcentration,
+                                                                y=p50,
+                                                                xout=cmaxfree)),
+                                 FracChangeCmaxFree_p2.5=(approx(x=freeconcentration,
+                                                                y=p2.5,
+                                                                xout=cmaxfree)),
+                                 FracChangeCmaxFree_p97.5=(approx(x=freeconcentration,
+                                                                y=p97.5,
+                                                                xout=cmaxfree))
+                                 ) 
+                      }
+                    )
+                  }
+                  )
+  )
+}
+
+for (i in 1:nrow(CmaxVivo)) {
+  j<-CmaxVivo$j[i]
+  cmaxfree<-CmaxVivo$CmaxFree[i]
+  CmaxVitro<- rbind(CmaxVitro,
+                  with(data.list[[j]], {
+                    with(Simulation_Frame_3_Frac, {
+                      data.frame(j=j,Chemical.name=chemical.name,
+                                 Model="in vitro Donor 1070",
+                                 FracChangeCmaxFree_p50=(approx(x=freeconcentration,
+                                                                y=p50,
+                                                                xout=cmaxfree)),
+                                 FracChangeCmaxFree_p2.5=(approx(x=freeconcentration,
+                                                                y=p2.5,
+                                                                xout=cmaxfree)),
+                                 FracChangeCmaxFree_p97.5=(approx(x=freeconcentration,
+                                                                y=p97.5,
+                                                                xout=cmaxfree))
+                                 ) 
+                      }
+                    )
+                  }
+                  )
+  )
+}
+
+
+names(CmaxVivo)<-paste("InVivo.",names(CmaxVivo),sep="")
+names(CmaxVitro)<-paste("InVitro.",names(CmaxVitro),sep="")
+Cmax.df <- cbind(rbind(CmaxVivo,CmaxVivo,CmaxVivo,CmaxVivo,CmaxVivo,CmaxVivo),CmaxVitro)
+
+```
+
+```{r cmax plots}
+
+p1<-ggplot(subset(Cmax.df,InVitro.Model=="in vitro Population Median" &
+                    InVivo.FracChangeCmaxFree != 0), 
+       aes(x=100*InVivo.FracChangeCmaxFree, 
+           y=100*InVitro.FracChangeCmaxFree_p50.y, shape=InVivo.Chemical.name,
+           color=InVivo.Model))+
+  geom_abline(intercept=0, slope=1, color="grey60")+
+  geom_abline(intercept=0.5, slope=1, color="grey60", linetype="dashed")+
+  geom_abline(intercept=-0.5, slope=1, color="grey60", linetype="dashed")+
+  geom_point(size=3)+
+  geom_errorbar(aes(ymin=100*InVitro.FracChangeCmaxFree_p2.5.y, ymax=100*InVitro.FracChangeCmaxFree_p50.y))+
+  geom_errorbar(aes(ymin=100*InVitro.FracChangeCmaxFree_p50.y, ymax=100*InVitro.FracChangeCmaxFree_p97.5.y))+
+  scale_x_log10(breaks=c(0.1,1,10,100,1000),
+                    labels=paste(c(0.1,1,10,100,1000)))+
+  scale_y_log10(breaks=c(0.1,1,10,100,1000),
+                    labels=paste(c(0.1,1,10,100,1000)))+
+  annotation_logticks(color="grey50")+
+  coord_cartesian(xlim=c(1e-1,1000),ylim=c(1e-1,1000),expand=FALSE)+
+  ggtitle("In Vivo vs. In Vitro % Change at Cmax")+
+  labs(x="In Vivo % Change", y="In Vitro % Change")+
+      theme_bw()+scale_shape_manual(values=c(15:18,7,8,0,1,2,5))+scale_color_viridis(discrete=TRUE,option="A",end=0.7) 
+
+
+p2<-ggplot(subset(Cmax.df,InVitro.Model=="in vitro Standard Donor" &
+                    InVivo.FracChangeCmaxFree != 0), 
+       aes(x=100*InVivo.FracChangeCmaxFree, 
+           y=100*InVitro.FracChangeCmaxFree_p50.y, shape=InVivo.Chemical.name,
+           color=InVivo.Model))+
+  geom_abline(intercept=0, slope=1, color="grey60")+
+  geom_abline(intercept=0.5, slope=1, color="grey60", linetype="dashed")+
+  geom_abline(intercept=-0.5, slope=1, color="grey60", linetype="dashed")+
+  geom_point(size=3)+
+  geom_errorbar(aes(ymin=100*InVitro.FracChangeCmaxFree_p2.5.y, ymax=100*InVitro.FracChangeCmaxFree_p50.y))+
+  geom_errorbar(aes(ymin=100*InVitro.FracChangeCmaxFree_p50.y, ymax=100*InVitro.FracChangeCmaxFree_p97.5.y))+
+  scale_x_log10(breaks=c(0.1,1,10,100,1000),
+                    labels=paste(c(0.1,1,10,100,1000)))+
+  scale_y_log10(breaks=c(0.1,1,10,100,1000),
+                    labels=paste(c(0.1,1,10,100,1000)))+
+  annotation_logticks(color="grey50")+
+  coord_cartesian(xlim=c(1e-1,1000),ylim=c(1e-1,1000),expand=FALSE)+
+  ggtitle("In Vivo vs. In Vitro % Change at Cmax Standard Donor")+
+  labs(x="In Vivo % Change", y="In Vitro % Change")+
+      theme_bw()+scale_shape_manual(values=c(15:18,7,8,0,1,2,5))+scale_color_viridis(discrete=TRUE,option="A",end=0.7) 
+
+dattmp<-subset(Cmax.df,InVitro.Model=="in vitro Standard Donor")
+ytmp<-log(dattmp$InVivo.FracChangeCmaxFree)
+ytmp[is.infinite(ytmp)]<-NA
+xtmp<-log(dattmp$InVitro.FracChangeCmaxFree_p50.y)
+ecmaxlm.stddonor<-lm( ytmp ~ xtmp)
+
+p3 <- ggplot(subset(Cmax.df,(InVitro.Model == "in vitro Population Median" |
+                      InVitro.Model == "in vitro Standard Donor") &
+                    InVivo.FracChangeCmaxFree != 0), 
+       aes(x=100*InVivo.FracChangeCmaxFree, 
+           y=100*InVitro.FracChangeCmaxFree_p50.y, shape=InVivo.Chemical.name,
+           color=InVivo.Model))+
+  geom_abline(intercept=0, slope=1, color="grey60")+
+  geom_abline(intercept=0.5, slope=1, color="grey60", linetype="dashed")+
+  geom_abline(intercept=-0.5, slope=1, color="grey60", linetype="dashed")+
+  geom_point(size=3)+
+  geom_errorbar(aes(ymin=100*InVitro.FracChangeCmaxFree_p2.5.y, ymax=100*InVitro.FracChangeCmaxFree_p50.y))+
+  geom_errorbar(aes(ymin=100*InVitro.FracChangeCmaxFree_p50.y, ymax=100*InVitro.FracChangeCmaxFree_p97.5.y))+
+  scale_x_log10(breaks=c(0.1,1,10,100),
+                    labels=paste(c(0.1,1,10,100)))+
+  scale_y_log10(breaks=c(0.1,1,10,100,1000),
+                    labels=paste(c(0.1,1,10,100,1000)))+
+  annotation_logticks(color="grey50")+
+  coord_cartesian(xlim=c(1e-1,1000),ylim=c(1e-1,1000),expand=FALSE)+
+  ggtitle("In Vivo vs. In Vitro % Change at Cmax")+
+  labs(x="In Vivo % Change", y="In Vitro % Change")+
+  facet_wrap(~InVitro.Model)+
+      theme_bw()+scale_shape_manual(values=c(15:18,7,8,0,1,2,5))+scale_color_viridis(discrete=TRUE,option="A",end=0.7) 
+
+print(p1)
+ggsave("43InVitroInVivo-LiteratureFreeFrac.PopMed.ECmax.pdf",p1,height=5,width=7,dpi=600)
+print(p2)
+ggsave("43InVitroInVivo-LiteratureFreeFrac.StdDonor.ECmax.pdf",p2,height=5,width=7,dpi=600)
+print(p3)
+ggsave("43InVitroInVivo-LiteratureFreeFrac.ECmax.pdf",p3,
+        height=5,width=11,dpi=600)
+
+
+```
+## Generate ECs in vivo vs in vitro
+
+```{r ec calcs}
+
+ECVivo<-data.frame()
+for (j in 1:nrow(chemmap)) {
+  for (k in 1:length(levels(data.list[[j]]$InVivo$Model))) {
+    ECVivo<- rbind(ECVivo,with(data.list[[j]], {
+      with(subset(InVivo,Model==levels(InVivo$Model)[k]),{
+        if (length(xfree)>0 & sum(PredFracChange) > 0) {
+        data.frame(j=j,Chemical.name=Chemical.name[1],
+                        Model = Model[1],
+                        EC10=(approx(x=PredFracChange, y=xfree, xout=0.1)),
+                        EC05=(approx(x=PredFracChange, y=xfree, xout=0.05)), 
+                        EC01=(approx(x=PredFracChange, y=xfree, xout=0.01)))
+        }
+      }
+      )
+    }
+    )
+    )
+  }
+}
+
+ECVitro<- data.frame()
+for (i in 1:nrow(ECVivo)) {
+  j<-ECVivo$j[i]
+  ECVitro<- rbind(ECVitro,
+                  with(data.list[[j]], {
+                    with(Simulation_Frame_Zero_Frac, {
+                      data.frame(j=j,Chemical.name=chemical.name,
+                                 Model="in vitro Population Median",
+                                 EC10_p50=(approx(x=p50, y=freeconcentration, xout=0.1)), 
+                                 EC10_p97.5=(approx(x=p97.5,y=freeconcentration, xout=0.1)), 
+                                 EC10_p2.5=(approx(x=p2.5, y=freeconcentration, xout=0.1)),
+                                 EC05_p50=(approx(x=p50, y=freeconcentration, xout=0.05)), 
+                                 EC05_p97.5=(approx(x=p97.5,y=freeconcentration, xout=0.05)), 
+                                 EC05_p2.5=(approx(x=p2.5, y=freeconcentration, xout=0.05)), 
+                                 EC01_p50=(approx(x=p50, y=freeconcentration, xout=0.01)), 
+                                 EC01_p97.5=(approx(x=p97.5,y=freeconcentration, xout=0.01)), 
+                                 EC01_p2.5=(approx(x=p2.5, y=freeconcentration, xout=0.01)) )
+                      }
+                    )
+                  }
+                  )
+  )
+}
+
+for (i in 1:nrow(ECVivo)) {
+  j<-ECVivo$j[i]
+  ECVitro<- rbind(ECVitro,
+                  with(data.list[[j]], {
+                    with(Simulation_Frame_27_Frac, {
+                      data.frame(j=j,Chemical.name=chemical.name,
+                                 Model="in vitro Standard Donor",
+                                 EC10_p50=(approx(x=p50, y=freeconcentration, xout=0.1)), 
+                                 EC10_p97.5=(approx(x=p97.5,y=freeconcentration, xout=0.1)), 
+                                 EC10_p2.5=(approx(x=p2.5, y=freeconcentration, xout=0.1)),
+                                 EC05_p50=(approx(x=p50, y=freeconcentration, xout=0.05)), 
+                                 EC05_p97.5=(approx(x=p97.5,y=freeconcentration, xout=0.05)), 
+                                 EC05_p2.5=(approx(x=p2.5, y=freeconcentration, xout=0.05)), 
+                                 EC01_p50=(approx(x=p50, y=freeconcentration, xout=0.01)), 
+                                 EC01_p97.5=(approx(x=p97.5,y=freeconcentration, xout=0.01)), 
+                                 EC01_p2.5=(approx(x=p2.5, y=freeconcentration, xout=0.01)) )
+                      }
+                    )
+                  }
+                  )
+  )
+}
+
+for (i in 1:nrow(ECVivo)) {
+  j<-ECVivo$j[i]
+  ECVitro<- rbind(ECVitro,
+                  with(data.list[[j]], {
+                    with(Simulation_Frame_22_Frac, {
+                      data.frame(j=j,Chemical.name=chemical.name,
+                                 Model="in vitro Donor 1392",
+                                 EC10_p50=(approx(x=p50, y=freeconcentration, xout=0.1)), 
+                                 EC10_p97.5=(approx(x=p97.5,y=freeconcentration, xout=0.1)), 
+                                 EC10_p2.5=(approx(x=p2.5, y=freeconcentration, xout=0.1)),
+                                 EC05_p50=(approx(x=p50, y=freeconcentration, xout=0.05)), 
+                                 EC05_p97.5=(approx(x=p97.5,y=freeconcentration, xout=0.05)), 
+                                 EC05_p2.5=(approx(x=p2.5, y=freeconcentration, xout=0.05)), 
+                                 EC01_p50=(approx(x=p50, y=freeconcentration, xout=0.01)), 
+                                 EC01_p97.5=(approx(x=p97.5,y=freeconcentration, xout=0.01)), 
+                                 EC01_p2.5=(approx(x=p2.5, y=freeconcentration, xout=0.01)) )
+                      }
+                    )
+                  }
+                  )
+  )
+}
+
+for (i in 1:nrow(ECVivo)) {
+  j<-ECVivo$j[i]
+  ECVitro<- rbind(ECVitro,
+                  with(data.list[[j]], {
+                    with(Simulation_Frame_11_Frac, {
+                      data.frame(j=j,Chemical.name=chemical.name,
+                                 Model="in vitro Donor 1258",
+                                 EC10_p50=(approx(x=p50, y=freeconcentration, xout=0.1)), 
+                                 EC10_p97.5=(approx(x=p97.5,y=freeconcentration, xout=0.1)), 
+                                 EC10_p2.5=(approx(x=p2.5, y=freeconcentration, xout=0.1)),
+                                 EC05_p50=(approx(x=p50, y=freeconcentration, xout=0.05)), 
+                                 EC05_p97.5=(approx(x=p97.5,y=freeconcentration, xout=0.05)), 
+                                 EC05_p2.5=(approx(x=p2.5, y=freeconcentration, xout=0.05)), 
+                                 EC01_p50=(approx(x=p50, y=freeconcentration, xout=0.01)), 
+                                 EC01_p97.5=(approx(x=p97.5,y=freeconcentration, xout=0.01)), 
+                                 EC01_p2.5=(approx(x=p2.5, y=freeconcentration, xout=0.01)) )
+                      }
+                    )
+                  }
+                  )
+  )
+}
+
+for (i in 1:nrow(ECVivo)) {
+  j<-ECVivo$j[i]
+  ECVitro<- rbind(ECVitro,
+                  with(data.list[[j]], {
+                    with(Simulation_Frame_6_Frac, {
+                      data.frame(j=j,Chemical.name=chemical.name,
+                                 Model="in vitro Donor 1083",
+                                 EC10_p50=(approx(x=p50, y=freeconcentration, xout=0.1)), 
+                                 EC10_p97.5=(approx(x=p97.5,y=freeconcentration, xout=0.1)), 
+                                 EC10_p2.5=(approx(x=p2.5, y=freeconcentration, xout=0.1)),
+                                 EC05_p50=(approx(x=p50, y=freeconcentration, xout=0.05)), 
+                                 EC05_p97.5=(approx(x=p97.5,y=freeconcentration, xout=0.05)), 
+                                 EC05_p2.5=(approx(x=p2.5, y=freeconcentration, xout=0.05)), 
+                                 EC01_p50=(approx(x=p50, y=freeconcentration, xout=0.01)), 
+                                 EC01_p97.5=(approx(x=p97.5,y=freeconcentration, xout=0.01)), 
+                                 EC01_p2.5=(approx(x=p2.5, y=freeconcentration, xout=0.01)) )
+                      }
+                    )
+                  }
+                  )
+  )
+}
+
+for (i in 1:nrow(ECVivo)) {
+  j<-ECVivo$j[i]
+  ECVitro<- rbind(ECVitro,
+                  with(data.list[[j]], {
+                    with(Simulation_Frame_3_Frac, {
+                      data.frame(j=j,Chemical.name=chemical.name,
+                                 Model="in vitro Donor 1070",
+                                 EC10_p50=(approx(x=p50, y=freeconcentration, xout=0.1)), 
+                                 EC10_p97.5=(approx(x=p97.5,y=freeconcentration, xout=0.1)), 
+                                 EC10_p2.5=(approx(x=p2.5, y=freeconcentration, xout=0.1)),
+                                 EC05_p50=(approx(x=p50, y=freeconcentration, xout=0.05)), 
+                                 EC05_p97.5=(approx(x=p97.5,y=freeconcentration, xout=0.05)), 
+                                 EC05_p2.5=(approx(x=p2.5, y=freeconcentration, xout=0.05)), 
+                                 EC01_p50=(approx(x=p50, y=freeconcentration, xout=0.01)), 
+                                 EC01_p97.5=(approx(x=p97.5,y=freeconcentration, xout=0.01)), 
+                                 EC01_p2.5=(approx(x=p2.5, y=freeconcentration, xout=0.01)) )
+                      }
+                    )
+                  }
+                  )
+  )
+}
+names(ECVivo)<-paste("InVivo.",names(ECVivo),sep="")
+names(ECVitro)<-paste("InVitro.",names(ECVitro),sep="")
+EC.df <- cbind(rbind(ECVivo,ECVivo,ECVivo,ECVivo,ECVivo,ECVivo),ECVitro)
+```
+
+```{r EC10 plots}
+
+p1<-ggplot(subset(EC.df,InVitro.Model=="in vitro Population Median"), 
+       aes(x=InVivo.EC10.y, y=InVitro.EC10_p50.y, shape=InVivo.Chemical.name,
+           color=InVivo.Model))+
+  geom_abline(intercept=0, slope=1, color="grey60")+
+  geom_abline(intercept=0.5, slope=1, color="grey60", linetype="dashed")+
+  geom_abline(intercept=-0.5, slope=1, color="grey60", linetype="dashed")+
+  geom_point(size=3)+
+  geom_errorbar(aes(ymin=InVitro.EC10_p2.5.y, ymax=InVitro.EC10_p50.y))+
+  geom_errorbar(aes(ymin=InVitro.EC10_p50.y, ymax=InVitro.EC10_p97.5.y))+
+  scale_x_log10(breaks=c(0.001,0.01,0.1,1,10,100),
+                    labels=paste(c(0.001,0.01,0.1,1,10,100)))+
+  scale_y_log10(breaks=c(0.001,0.01,0.1,1,10,100),
+                    labels=paste(c(0.001,0.01,0.1,1,10,100)))+
+  annotation_logticks(color="grey50")+
+  coord_cartesian(xlim=c(1e-4,100),ylim=c(1e-4,100),expand=FALSE)+
+  ggtitle("In Vivo vs. In Vitro EC10")+
+  labs(x="In Vivo EC10", y="In Vitro Population Median EC10")+
+      theme_bw()+scale_shape_manual(values=c(15:18,7,8,0,1,2,5))+scale_color_viridis(discrete=TRUE,option="A",end=0.7) 
+EC10lm.popmed<-lm(log(InVivo.EC10.y) ~ log(InVitro.EC10_p50.y),
+                    data=subset(EC.df,InVitro.Model=="in vitro Population Median"))
+
+p2<-ggplot(subset(EC.df,InVitro.Model=="in vitro Standard Donor"), 
+       aes(x=InVivo.EC10.y, y=InVitro.EC10_p50.y, shape=InVivo.Chemical.name,
+           color=InVivo.Model))+
+  geom_abline(intercept=0, slope=1, color="grey60")+
+  geom_abline(intercept=0.5, slope=1, color="grey60", linetype="dashed")+
+  geom_abline(intercept=-0.5, slope=1, color="grey60", linetype="dashed")+
+  geom_point(size=3)+
+  geom_errorbar(aes(ymin=InVitro.EC10_p2.5.y, ymax=InVitro.EC10_p50.y))+
+  geom_errorbar(aes(ymin=InVitro.EC10_p50.y, ymax=InVitro.EC10_p97.5.y))+
+  scale_x_log10(breaks=c(0.001,0.01,0.1,1,10,100),
+                    labels=paste(c(0.001,0.01,0.1,1,10,100)))+
+  scale_y_log10(breaks=c(0.001,0.01,0.1,1,10,100),
+                    labels=paste(c(0.001,0.01,0.1,1,10,100)))+
+  annotation_logticks(color="grey50")+
+  coord_cartesian(xlim=c(1e-4,100),ylim=c(1e-4,100),expand=FALSE)+
+  ggtitle("In Vivo vs. In Vitro EC10")+
+  labs(x="In Vivo EC10", y="In Vitro Standard Donor EC10")+
+      theme_bw()+scale_shape_manual(values=c(15:18,7,8,0,1,2,5))+scale_color_viridis(discrete=TRUE,option="A",end=0.7) 
+
+
+
+p3<-ggplot(subset(EC.df,InVitro.Model == "in vitro Population Median" |
+                      InVitro.Model == "in vitro Standard Donor"), 
+       aes(x=InVivo.EC10.y, y=InVitro.EC10_p50.y, shape=InVivo.Chemical.name,
+           color=InVivo.Model))+
+  geom_abline(intercept=0, slope=1, color="grey60")+
+  geom_abline(intercept=0.5, slope=1, color="grey60", linetype="dashed")+
+  geom_abline(intercept=-0.5, slope=1, color="grey60", linetype="dashed")+
+  geom_point(size=3)+
+  geom_errorbar(aes(ymin=InVitro.EC10_p2.5.y, ymax=InVitro.EC10_p50.y))+
+  geom_errorbar(aes(ymin=InVitro.EC10_p50.y, ymax=InVitro.EC10_p97.5.y))+
+  scale_x_log10(breaks=c(0.001,0.01,0.1,1,10),
+                    labels=paste(c(0.001,0.01,0.1,1,10)))+
+  scale_y_log10(breaks=c(0.001,0.01,0.1,1,10,100),
+                    labels=paste(c(0.001,0.01,0.1,1,10,100)))+
+  annotation_logticks(color="grey50")+
+  coord_cartesian(xlim=c(1e-4,100),ylim=c(1e-4,100),expand=FALSE)+
+  ggtitle("In Vivo vs. In Vitro EC10")+
+  labs(x="In Vivo EC10", y="In Vitro EC10")+
+  facet_wrap(~InVitro.Model)+
+      theme_bw()+scale_shape_manual(values=c(15:18,7,8,0,1,2,5))+scale_color_viridis(discrete=TRUE,option="A",end=0.7) 
+
+print(p1)
+ggsave("43InVitroInVivo-LiteratureFreeFrac.PopMed.EC10.pdf",p1,height=5,width=7,dpi=600)
+print(p2)
+ggsave("43InVitroInVivo-LiteratureFreeFrac.StdDonor.EC10.pdf",p2,height=5,width=7,dpi=600)
+print(p3)
+ggsave("43InVitroInVivo-LiteratureFreeFrac.EC10.pdf",p3,
+        height=5,width=11,dpi=600)
+```
+
+
+```{r EC05 plots}
+
+p1<-ggplot(subset(EC.df,InVitro.Model=="in vitro Population Median"), 
+       aes(x=InVivo.EC05.y, y=InVitro.EC05_p50.y, shape=InVivo.Chemical.name,
+           color=InVivo.Model))+
+  geom_abline(intercept=0, slope=1, color="grey60")+
+  geom_abline(intercept=0.5, slope=1, color="grey60", linetype="dashed")+
+  geom_abline(intercept=-0.5, slope=1, color="grey60", linetype="dashed")+
+  geom_point(size=3)+
+  geom_errorbar(aes(ymin=InVitro.EC05_p2.5.y, ymax=InVitro.EC05_p50.y))+
+  geom_errorbar(aes(ymin=InVitro.EC05_p50.y, ymax=InVitro.EC05_p97.5.y))+
+  scale_x_log10(breaks=c(0.001,0.01,0.1,1,10,100),
+                    labels=paste(c(0.001,0.01,0.1,1,10,100)))+
+  scale_y_log10(breaks=c(0.001,0.01,0.1,1,10,100),
+                    labels=paste(c(0.001,0.01,0.1,1,10,100)))+
+  annotation_logticks(color="grey50")+
+  coord_cartesian(xlim=c(1e-4,100),ylim=c(1e-4,100),expand=FALSE)+
+  ggtitle("In Vivo vs. In Vitro EC05")+
+  labs(x="In Vivo EC05", y="In Vitro Population Median EC05")+
+      theme_bw()+scale_shape_manual(values=c(15:18,7,8,0,1,2,5))+scale_color_viridis(discrete=TRUE,option="A",end=0.7) 
+EC05lm.popmed<-lm(log(InVivo.EC05.y) ~ log(InVitro.EC05_p50.y),
+                    data=subset(EC.df,InVitro.Model=="in vitro Population Median"))
+
+p2<-ggplot(subset(EC.df,InVitro.Model=="in vitro Standard Donor"), 
+       aes(x=InVivo.EC05.y, y=InVitro.EC05_p50.y, shape=InVivo.Chemical.name,
+           color=InVivo.Model))+
+  geom_abline(intercept=0, slope=1, color="grey60")+
+  geom_abline(intercept=0.5, slope=1, color="grey60", linetype="dashed")+
+  geom_abline(intercept=-0.5, slope=1, color="grey60", linetype="dashed")+
+  geom_point(size=3)+
+  geom_errorbar(aes(ymin=InVitro.EC05_p2.5.y, ymax=InVitro.EC05_p50.y))+
+  geom_errorbar(aes(ymin=InVitro.EC05_p50.y, ymax=InVitro.EC05_p97.5.y))+
+  scale_x_log10(breaks=c(0.001,0.01,0.1,1,10,100),
+                    labels=paste(c(0.001,0.01,0.1,1,10,100)))+
+  scale_y_log10(breaks=c(0.001,0.01,0.1,1,10,100),
+                    labels=paste(c(0.001,0.01,0.1,1,10,100)))+
+  annotation_logticks(color="grey50")+
+  coord_cartesian(xlim=c(1e-4,100),ylim=c(1e-4,100),expand=FALSE)+
+  ggtitle("In Vivo vs. In Vitro EC05")+
+  labs(x="In Vivo EC05", y="In Vitro Standard Donor EC05")+
+      theme_bw()+scale_shape_manual(values=c(15:18,7,8,0,1,2,5))+scale_color_viridis(discrete=TRUE,option="A",end=0.7) 
+
+EC05lm.stddonor<-lm(log(InVivo.EC05.y) ~ log(InVitro.EC05_p50.y),
+                    data=subset(EC.df,InVitro.Model=="in vitro Standard Donor"))
+
+p3<-ggplot(subset(EC.df,InVitro.Model == "in vitro Population Median" |
+                      InVitro.Model == "in vitro Standard Donor"), 
+       aes(x=InVivo.EC05.y, y=InVitro.EC05_p50.y, shape=InVivo.Chemical.name,
+           color=InVivo.Model))+
+  geom_abline(intercept=0, slope=1, color="grey60")+
+  geom_abline(intercept=0.5, slope=1, color="grey60", linetype="dashed")+
+  geom_abline(intercept=-0.5, slope=1, color="grey60", linetype="dashed")+
+  geom_point(size=3)+
+  geom_errorbar(aes(ymin=InVitro.EC05_p2.5.y, ymax=InVitro.EC05_p50.y))+
+  geom_errorbar(aes(ymin=InVitro.EC05_p50.y, ymax=InVitro.EC05_p97.5.y))+
+  scale_x_log10(breaks=c(0.001,0.01,0.1,1,10),
+                    labels=paste(c(0.001,0.01,0.1,1,10)))+
+  scale_y_log10(breaks=c(0.001,0.01,0.1,1,10,100),
+                    labels=paste(c(0.001,0.01,0.1,1,10,100)))+
+  annotation_logticks(color="grey50")+
+  coord_cartesian(xlim=c(1e-4,100),ylim=c(1e-4,100),expand=FALSE)+
+  ggtitle("In Vivo vs. In Vitro EC05")+
+  labs(x="In Vivo EC05", y="In Vitro EC05")+
+  facet_wrap(~InVitro.Model)+
+      theme_bw()+scale_shape_manual(values=c(15:18,7,8,0,1,2,5))+scale_color_viridis(discrete=TRUE,option="A",end=0.7) 
+
+print(p1)
+ggsave("43InVitroInVivo-LiteratureFreeFrac.PopMed.EC05.pdf",p1,height=5,width=7,dpi=600)
+print(p2)
+ggsave("43InVitroInVivo-LiteratureFreeFrac.StdDonor.EC05.pdf",p2,height=5,width=7,dpi=600)
+print(p3)
+ggsave("43InVitroInVivo-LiteratureFreeFrac.EC05.pdf",p3,
+        height=5,width=11,dpi=600)
+
+```
+
+
+```{r EC01 plots}
+
+
+p1<-ggplot(subset(EC.df,InVitro.Model=="in vitro Population Median"), 
+       aes(x=InVivo.EC01.y, y=InVitro.EC01_p50.y, shape=InVivo.Chemical.name,
+           color=InVivo.Model))+
+  geom_abline(intercept=0, slope=1, color="grey60")+
+  geom_abline(intercept=0.5, slope=1, color="grey60", linetype="dashed")+
+  geom_abline(intercept=-0.5, slope=1, color="grey60", linetype="dashed")+
+  geom_point(size=3)+
+  geom_errorbar(aes(ymin=InVitro.EC01_p2.5.y, ymax=InVitro.EC01_p50.y))+
+  geom_errorbar(aes(ymin=InVitro.EC01_p50.y, ymax=InVitro.EC01_p97.5.y))+
+  scale_x_log10(breaks=c(0.001,0.01,0.1,1,10,100),
+                    labels=paste(c(0.001,0.01,0.1,1,10,100)))+
+  scale_y_log10(breaks=c(0.001,0.01,0.1,1,10,100),
+                    labels=paste(c(0.001,0.01,0.1,1,10,100)))+
+  annotation_logticks(color="grey50")+
+  coord_cartesian(xlim=c(1e-4,100),ylim=c(1e-4,100),expand=FALSE)+
+  ggtitle("In Vivo vs. In Vitro EC01")+
+  labs(x="In Vivo EC01", y="In Vitro Population Median EC01")+
+      theme_bw()+scale_shape_manual(values=c(15:18,7,8,0,1,2,5))+scale_color_viridis(discrete=TRUE,option="A",end=0.7) 
+EC01lm.popmed<-lm(log(InVivo.EC01.y) ~ log(InVitro.EC01_p50.y),
+                    data=subset(EC.df,InVitro.Model=="in vitro Population Median"))
+
+p2<-ggplot(subset(EC.df,InVitro.Model=="in vitro Standard Donor"), 
+       aes(x=InVivo.EC01.y, y=InVitro.EC01_p50.y, shape=InVivo.Chemical.name,
+           color=InVivo.Model))+
+  geom_abline(intercept=0, slope=1, color="grey60")+
+  geom_abline(intercept=0.5, slope=1, color="grey60", linetype="dashed")+
+  geom_abline(intercept=-0.5, slope=1, color="grey60", linetype="dashed")+
+  geom_point(size=3)+
+  geom_errorbar(aes(ymin=InVitro.EC01_p2.5.y, ymax=InVitro.EC01_p50.y))+
+  geom_errorbar(aes(ymin=InVitro.EC01_p50.y, ymax=InVitro.EC01_p97.5.y))+
+  scale_x_log10(breaks=c(0.001,0.01,0.1,1,10,100),
+                    labels=paste(c(0.001,0.01,0.1,1,10,100)))+
+  scale_y_log10(breaks=c(0.001,0.01,0.1,1,10,100),
+                    labels=paste(c(0.001,0.01,0.1,1,10,100)))+
+  annotation_logticks(color="grey50")+
+  coord_cartesian(xlim=c(1e-4,100),ylim=c(1e-4,100),expand=FALSE)+
+  ggtitle("In Vivo vs. In Vitro EC01")+
+  labs(x="In Vivo EC01", y="In Vitro Standard Donor EC01")+
+      theme_bw()+scale_shape_manual(values=c(15:18,7,8,0,1,2,5))+scale_color_viridis(discrete=TRUE,option="A",end=0.7) 
+
+EC01lm.stddonor<-lm(log(InVivo.EC01.y) ~ log(InVitro.EC01_p50.y),
+                    data=subset(EC.df,InVitro.Model=="in vitro Standard Donor"))
+
+p3<-ggplot(subset(EC.df,InVitro.Model == "in vitro Population Median" |
+                      InVitro.Model == "in vitro Standard Donor"), 
+       aes(x=InVivo.EC01.y, y=InVitro.EC01_p50.y, shape=InVivo.Chemical.name,
+           color=InVivo.Model))+
+  geom_abline(intercept=0, slope=1, color="grey60")+
+  geom_abline(intercept=0.5, slope=1, color="grey60", linetype="dashed")+
+  geom_abline(intercept=-0.5, slope=1, color="grey60", linetype="dashed")+
+  geom_point(size=3)+
+  geom_errorbar(aes(ymin=InVitro.EC01_p2.5.y, ymax=InVitro.EC01_p50.y))+
+  geom_errorbar(aes(ymin=InVitro.EC01_p50.y, ymax=InVitro.EC01_p97.5.y))+
+  scale_x_log10(breaks=c(0.001,0.01,0.1,1,10),
+                    labels=paste(c(0.001,0.01,0.1,1,10)))+
+  scale_y_log10(breaks=c(0.001,0.01,0.1,1,10,100),
+                    labels=paste(c(0.001,0.01,0.1,1,10,100)))+
+  annotation_logticks(color="grey50")+
+  coord_cartesian(xlim=c(1e-4,100),ylim=c(1e-4,100),expand=FALSE)+
+  ggtitle("In Vivo vs. In Vitro EC01")+
+  labs(x="In Vivo EC01", y="In Vitro EC01")+
+  facet_wrap(~InVitro.Model)+
+      theme_bw()+scale_shape_manual(values=c(15:18,7,8,0,1,2,5))+scale_color_viridis(discrete=TRUE,option="A",end=0.7) 
+
+print(p1)
+ggsave("43InVitroInVivo-LiteratureFreeFrac.PopMed.EC01.pdf",p1,height=5,width=7,dpi=600)
+print(p2)
+ggsave("43InVitroInVivo-LiteratureFreeFrac.StdDonor.EC01.pdf",p2,height=5,width=7,dpi=600)
+print(p3)
+ggsave("43InVitroInVivo-LiteratureFreeFrac.EC01.pdf",p3,
+        height=5,width=11,dpi=600)
+
+```
+
+```{r statistics on IVIV corr}
+Cmax.df$Output<-"ECmax"
+allEC.df<-Cmax.df[,c("Output","InVivo.Chemical.name",
+                        "InVivo.Model",
+                        "InVitro.Model",
+                        "InVivo.FracChangeCmaxFree",
+                        "InVitro.FracChangeCmaxFree_p50.y",
+                     "InVitro.FracChangeCmaxFree_p2.5.y",
+                     "InVitro.FracChangeCmaxFree_p97.5.y"
+                     )]
+names(allEC.df)[c(2,5,6,7,8)]<-c("Chemical.name","InVivo",
+                                 "InVitro.p50",
+                                 "InVitro.p2.5",
+                                 "InVitro.p97.5")
+
+EC10.df <- data.frame(Output=rep("EC10",nrow(EC.df)))
+EC10.df <- cbind(EC10.df,EC.df[,c("InVivo.Chemical.name",
+                        "InVivo.Model",
+                        "InVitro.Model",
+                        "InVivo.EC10.y",
+                        "InVitro.EC10_p50.y",
+                        "InVitro.EC10_p2.5.y",
+                        "InVitro.EC10_p97.5.y")])
+names(EC10.df)[c(2,5,6,7,8)]<-c("Chemical.name","InVivo",
+                                 "InVitro.p50",
+                                 "InVitro.p2.5",
+                                 "InVitro.p97.5")
+EC05.df <- data.frame(Output=rep("EC05",nrow(EC.df)))
+EC05.df <- cbind(EC05.df,EC.df[,c("InVivo.Chemical.name",
+                        "InVivo.Model",
+                        "InVitro.Model",
+                        "InVivo.EC05.y",
+                        "InVitro.EC05_p50.y",
+                        "InVitro.EC05_p2.5.y",
+                        "InVitro.EC05_p97.5.y")])
+names(EC05.df)[c(2,5,6,7,8)]<-c("Chemical.name","InVivo",
+                                 "InVitro.p50",
+                                 "InVitro.p2.5",
+                                 "InVitro.p97.5")
+EC01.df <- data.frame(Output=rep("EC01",nrow(EC.df)))
+EC01.df <- cbind(EC01.df,EC.df[,c("InVivo.Chemical.name",
+                        "InVivo.Model",
+                        "InVitro.Model",
+                        "InVivo.EC01.y",
+                        "InVitro.EC01_p50.y",
+                        "InVitro.EC01_p2.5.y",
+                        "InVitro.EC01_p97.5.y")])
+names(EC01.df)[c(2,5,6,7,8)]<-c("Chemical.name","InVivo",
+                                 "InVitro.p50",
+                                 "InVitro.p2.5",
+                                 "InVitro.p97.5")
+
+allEC.df<-rbind(EC01.df,EC05.df,EC10.df,allEC.df)
+
+allEC.df$log10err.p50 <- log10(allEC.df$InVitro.p50)-log10(allEC.df$InVivo)
+allEC.df$log10err.p97.5 <- log10(allEC.df$InVitro.p97.5)-log10(allEC.df$InVivo)
+allEC.df$log10err.p2.5 <- log10(allEC.df$InVitro.p2.5)-log10(allEC.df$InVivo)
+
+allEC.plotting<-subset(allEC.df,InVitro.Model=="in vitro Population Median" | 
+         InVitro.Model=="in vitro Standard Donor" )
+tmpindx<-allEC.plotting$Chemical.name=="Dofetilide" & 
+  is.na(allEC.plotting$log10err.p97.5)
+allEC.plotting$log10err.p97.5[tmpindx]<-Inf
+
+ggplot(allEC.plotting,aes(y=Chemical.name,x=log10err.p50))+geom_point()+
+  facet_grid(Output~InVitro.Model)+
+  geom_errorbarh(aes(xmax=log10err.p97.5,xmin=log10err.p2.5))
+
+allEC.summaries<-allEC.plotting[is.finite(allEC.plotting$log10err.p50) &
+                                  is.finite(allEC.plotting$log10err.p97.5),]
+
+summary(
+  EC01.pop.err.lm<-lm(log10err.p50 ~ 1,
+                      weights=1/((log10err.p97.5-log10err.p2.5)/(2*qnorm(0.975)))^2,
+             data=subset(allEC.summaries,Output=="EC01" & 
+                           InVitro.Model=="in vitro Population Median"))
+)$coefficients
+summary(EC01.std.err.lm<-lm(log10err.p50 ~ 1,
+                      weights=1/((log10err.p97.5-log10err.p2.5)/(2*qnorm(0.975)))^2,
+             data=subset(allEC.summaries,Output=="EC01" & 
+                           InVitro.Model=="in vitro Standard Donor"))
+)$coefficients
+summary(EC05.pop.err.lm<-lm(log10err.p50 ~ 1,
+                      weights=1/((log10err.p97.5-log10err.p2.5)/(2*qnorm(0.975)))^2,
+             data=subset(allEC.summaries,Output=="EC05" & 
+                           InVitro.Model=="in vitro Population Median"))
+)$coefficients
+summary(EC05.std.err.lm<-lm(log10err.p50 ~ 1,
+                      weights=1/((log10err.p97.5-log10err.p2.5)/(2*qnorm(0.975)))^2,
+             data=subset(allEC.summaries,Output=="EC05" & 
+                           InVitro.Model=="in vitro Standard Donor"))
+)$coefficients
+summary(EC10.pop.err.lm<-lm(log10err.p50 ~ 1,
+                      weights=1/((log10err.p97.5-log10err.p2.5)/(2*qnorm(0.975)))^2,
+             data=subset(allEC.summaries,Output=="EC10" & 
+                           InVitro.Model=="in vitro Population Median"))
+)$coefficients
+summary(EC10.std.err.lm<-lm(log10err.p50 ~ 1,
+                      weights=1/((log10err.p97.5-log10err.p2.5)/(2*qnorm(0.975)))^2,
+             data=subset(allEC.summaries,Output=="EC10" & 
+                           InVitro.Model=="in vitro Standard Donor"))
+)$coefficients
+summary(ECmax.pop.err.lm<-lm(log10err.p50 ~ 1,
+                      weights=1/((log10err.p97.5-log10err.p2.5)/(2*qnorm(0.975)))^2,
+             data=subset(allEC.summaries,Output=="ECmax" & 
+                           InVitro.Model=="in vitro Population Median"))
+)$coefficients
+summary(ECmax.std.err.lm<-lm(log10err.p50 ~ 1,
+                      weights=1/((log10err.p97.5-log10err.p2.5)/(2*qnorm(0.975)))^2,
+             data=subset(allEC.summaries,Output=="ECmax" & 
+                           InVitro.Model=="in vitro Standard Donor"))
+)$coefficients
+
+
+allEC.df$pcterr <- 100*(allEC.df$InVitro.p50-allEC.df$InVivo)/allEC.df$InVivo
+write.csv(allEC.df,"27IVIVE-LiteratureFreeFrac.csv")
+
+```
+
+```{r donors consistently sensitive or not}
+
+ggplot(subset(EC.df,
+              InVitro.Model!="in vitro Population Median" & 
+                InVitro.Model!="in vitro Standard Donor")) + 
+  geom_errorbar(aes(x=InVitro.Model,ymin=InVitro.EC10_p2.5.y,
+                    ymax=InVitro.EC10_p97.5.y))+ 
+  geom_point(aes(x=InVitro.Model,y=InVitro.EC10_p50.y,fill=InVitro.Model),
+             color="black",pch=21)+ 
+  scale_x_discrete(breaks=NULL) + 
+  scale_y_log10(name="EC10") +
+  facet_wrap(~InVitro.Chemical.name)+
+      theme_minimal()+scale_color_viridis(discrete=TRUE,option="A") +
+  scale_fill_viridis(discrete=TRUE,option="A")
+
+ggplot(subset(EC.df,
+              InVitro.Model!="in vitro Population Median" & 
+                InVitro.Model!="in vitro Standard Donor")) + 
+  geom_errorbar(aes(x=InVitro.Model,ymin=InVitro.EC05_p2.5.y,
+                    ymax=InVitro.EC05_p97.5.y))+ 
+  geom_point(aes(x=InVitro.Model,y=InVitro.EC05_p50.y,fill=InVitro.Model),
+             color="black",pch=21)+ 
+  scale_x_discrete(breaks=NULL) + 
+  scale_y_log10(name="EC05") +
+  facet_wrap(~InVitro.Chemical.name)+
+      theme_minimal()+scale_color_viridis(discrete=TRUE,option="A") +
+  scale_fill_viridis(discrete=TRUE,option="A")
+
+ggplot(subset(EC.df,
+              InVitro.Model!="in vitro Population Median" & 
+                InVitro.Model!="in vitro Standard Donor")) + 
+  geom_errorbar(aes(x=InVitro.Model,ymin=InVitro.EC01_p2.5.y,
+                    ymax=InVitro.EC01_p97.5.y))+ 
+  geom_point(aes(x=InVitro.Model,y=InVitro.EC01_p50.y,fill=InVitro.Model),
+             color="black",pch=21)+ 
+  scale_x_discrete(breaks=NULL) + 
+  scale_y_log10(name="EC01") +
+  facet_wrap(~InVitro.Chemical.name)+
+      theme_minimal()+scale_color_viridis(discrete=TRUE,option="A") +
+  scale_fill_viridis(discrete=TRUE,option="A")
+```
