@@ -83,10 +83,10 @@ for (j in 1:nrow(chemmap)) {
   #### Population median
   simframe_zero<-data.frame(y0=(exp(m_y0$m_y0)), x0=(exp(m_x0$m_x0)), Emax=(exp(m_Emax$m_Emax)), n=(exp(m_n$m_n)))
   #### Standard donor (cell line 27)
-  simframe_27<-data.frame(y0=c((eval(parse(text=files[1])))[2:2001, "y0.27"], (eval(parse(text=files[2])))[2:2001, "y0.27"], (eval(parse(text=files[3])))[2:2001, "y0.27"], (eval(parse(text=files[4])))[2:2001, "y0.27"]),
-                          x0=c((eval(parse(text=files[1])))[2:2001, "x0.27"], (eval(parse(text=files[2])))[2:2001, "x0.27"], (eval(parse(text=files[3])))[2:2001, "x0.27"], (eval(parse(text=files[4])))[2:2001, "x0.27"]), 
-                          Emax=c((eval(parse(text=files[1])))[2:2001, "Emax.27"], (eval(parse(text=files[2])))[2:2001, "Emax.27"], (eval(parse(text=files[3])))[2:2001, "Emax.27"], (eval(parse(text=files[4])))[2:2001, "Emax.27"]), 
-                          n=c((eval(parse(text=files[1])))[2:2001, "n.27"], (eval(parse(text=files[2])))[2:2001, "n.27"], (eval(parse(text=files[3])))[2:2001, "n.27"], (eval(parse(text=files[4])))[2:2001, "n.27"]))
+  simframe_27<-data.frame(y0=c((eval(parse(text=files[1])))[2:2001, "y0.28"], (eval(parse(text=files[2])))[2:2001, "y0.28"], (eval(parse(text=files[3])))[2:2001, "y0.28"], (eval(parse(text=files[4])))[2:2001, "y0.28"]),
+                          x0=c((eval(parse(text=files[1])))[2:2001, "x0.28"], (eval(parse(text=files[2])))[2:2001, "x0.28"], (eval(parse(text=files[3])))[2:2001, "x0.28"], (eval(parse(text=files[4])))[2:2001, "x0.28"]), 
+                          Emax=c((eval(parse(text=files[1])))[2:2001, "Emax.28"], (eval(parse(text=files[2])))[2:2001, "Emax.28"], (eval(parse(text=files[3])))[2:2001, "Emax.28"], (eval(parse(text=files[4])))[2:2001, "Emax.28"]), 
+                          n=c((eval(parse(text=files[1])))[2:2001, "n.28"], (eval(parse(text=files[2])))[2:2001, "n.28"], (eval(parse(text=files[3])))[2:2001, "n.28"], (eval(parse(text=files[4])))[2:2001, "n.28"]))
   
   #### Standard donor (cell line 22)
   simframe_22<-data.frame(y0=c((eval(parse(text=files[1])))[2:2001, "y0.22"], (eval(parse(text=files[2])))[2:2001, "y0.22"], (eval(parse(text=files[3])))[2:2001, "y0.22"], (eval(parse(text=files[4])))[2:2001, "y0.22"]),
