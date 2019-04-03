@@ -1,0 +1,14 @@
+"InVivo.j","InVivo.Chemical.name","InVivo.Model","InVivo.CmaxFree","InVivo.FracChangeCmaxFree","InVitro.j","InVitro.Chemical.name","InVitro.Model","InVitro.FracChangeCmaxFree_p50.x","InVitro.FracChangeCmaxFree_p50.y","InVitro.FracChangeCmaxFree_p2.5.x","InVitro.FracChangeCmaxFree_p2.5.y","InVitro.FracChangeCmaxFree_p97.5.x","InVitro.FracChangeCmaxFree_p97.5.y"
+1,"Cisapride","in vivo Linear",0.035481339,0.212124386,1,"Cisapride","in vitro Population Median",0.035481339,0.451675648381712,0.035481339,0.287336169821175,0.035481339,0.679457684453236
+2,"Citalopram","in vivo Linear",1,0.152654118,2,"Citalopram","in vitro Population Median",1,0.112111271010116,1,0.0815236417611707,1,0.145799074211567
+3,"Disopyramide","in vivo Linear",3.16227766,0.105570004,3,"Disopyramide","in vitro Population Median",3.16227766,0.0947872015412944,3.16227766,0.047883975100998,3.16227766,0.376647473915141
+3,"Disopyramide","in vivo Hill",7.943282347,0.120474259,3,"Disopyramide","in vitro Population Median",7.943282347,0.181144915706975,7.943282347,0.0844781327450694,7.943282347,0.376656415973686
+4,"Dofetilide","in vivo Hill",0.003981072,0.122016447,4,"Dofetilide","in vitro Population Median",0.003981072,0.254303146962667,0.003981072,6.13148091955746e-05,0.003981072,0.555979660443535
+5,"Moxifloxacin","in vivo Linear",2.511886432,0.016974263,5,"Moxifloxacin","in vitro Population Median",2.511886432,0.00164834601512535,2.511886432,1.30539405351343e-05,2.511886432,0.00766576058199072
+6,"N-acetylprocainamide","in vivo Linear",100,0.190181818,6,"N-acetylprocainamide","in vitro Population Median",100,NA,100,NA,100,NA
+6,"N-acetylprocainamide","in vivo Hill",100,0.29921251,6,"N-acetylprocainamide","in vitro Population Median",100,NA,100,NA,100,NA
+7,"Quinidine","in vivo Linear",2.238721139,1.093822647,7,"Quinidine","in vitro Population Median",2.238721139,0.383322316894762,2.238721139,0.273948580338053,2.238721139,0.528363841957145
+8,"Sematilide","in vivo Linear",2.818382931,0.279616313,8,"Sematilide","in vitro Population Median",2.818382931,0.621703307553062,2.818382931,0.241264303861925,2.818382931,0.898381447503589
+8,"Sematilide","in vivo Hill",2.818382931,0.152194953,8,"Sematilide","in vitro Population Median",2.818382931,0.621703307553062,2.818382931,0.241264303861925,2.818382931,0.898381447503589
+9,"Sotalol","in vivo Linear",1.995262315,0.052436194,9,"Sotalol","in vitro Population Median",1.995262315,0.206002053861557,1.995262315,0.128342313166381,1.995262315,0.364160313408998
+10,"Vernacalant","in vivo Hill",11.22018454,0.030274975,10,"Vernacalant","in vitro Population Median",11.22018454,0.0856255869544783,11.22018454,0.0383203195705352,11.22018454,0.158832688348949
